@@ -1,0 +1,43 @@
+[package]
+name = "mixer-contract"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["io"]
+
+[workspace.dependencies]
+gstd = {version = "1.5", features = ["panic-info-message", "panic-message"]}
+gmeta = "1.5"
+gear-wasm-builder = "1.5"
+
+parity-scale-codec = { version = "3", default-features = false}
+scale-info = { version = "2", default-features = false }
+hex-literal ={ version = "0.4.1", default-features = false}
+postcard = { version = "1.0.0", features = ["alloc"] }
+
+risc0-zkvm = {version = "1.0.5", default-features = false}
+
+rs_merkle = { git = "https://github.com/dan-sobolev-varathon/rs-merkle-fork", rev = "83fc54f", default-features = false }
+
+io = { path = "io"}
+
+[dependencies]
+gstd.workspace = true
+gmeta.workspace = true
+
+scale-info.workspace = true
+parity-scale-codec.workspace = true
+hex-literal.workspace = true
+postcard.workspace = true
+
+risc0-zkvm.workspace = true
+
+rs_merkle.workspace = true
+
+io.workspace = true
+
+[build-dependencies]
+gear-wasm-builder.workspace = true
+gmeta.workspace = true
+io.workspace = true
