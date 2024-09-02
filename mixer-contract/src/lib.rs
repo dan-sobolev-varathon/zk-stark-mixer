@@ -12,9 +12,7 @@ const RISC0_BUILTIN: ActorId = ActorId::new(hex_literal::hex!(
     "1ef25efb2be22235d221e0570bf57efd2b5483a39088cff6e9144b1125696632"
 ));
 
-const GUEST_ID: [u32; 8] = [
-    2230699346, 4268436014, 3267044257, 321895890, 1345792040, 3252790706, 3745928466, 754525525,
-];
+const GUEST_ID: [u32; 8] = [3059853664, 1138407129, 918623963, 946626020, 282452322, 3875698598, 154530926, 35396726];
 const VARA_UNIT: u128 = 1_000_000_000_000;
 const VARA_DEPOSIT_AMOUNT: u32 = 10;
 const DEPOSIT_AMOUNT: u128 = VARA_UNIT * VARA_DEPOSIT_AMOUNT as u128;
@@ -91,8 +89,25 @@ impl Mixer {
         msg::reply(ContractHandleEvent::Deposited, 0).expect("Error in reply in deposit");
     }
 
-    async fn withdraw(&mut self, image_id_receipt: Vec<[u8; 64]>) {
-        let used: Vec<[u8; 32]> = image_id_receipt.into_iter().map(|x| x[..32].try_into().unwrap()).collect();
+    async fn withdraw(&mut self, image_id_receipt: Vec<u8>) {
+        let image_id: [u32; 8] = postcard::from_bytes(&image_id_receipt).expect("Wrong image id");
+        assert_eq!(image_id, GUEST_ID, "Wrong image id in proof");
+
+        let public_outputs = msg::send_bytes_for_reply(RISC0_BUILTIN, image_id_receipt, 0, 0)
+            .expect("Error in send_bytes_for_reply in winthdraw")
+            .await
+            .expect("Error in your zk-proof");
+
+        let PublicOutputs { root, used } = deserialize_public_outputs(public_outputs);
+
+        assert!(
+            self.merkle_tree
+                .history
+                .iter()
+                .rfind(|&&x| x == root)
+                .is_some(),
+            "There has never been such a root"
+        );
 
         let mut amount = 0;
         for u in used {

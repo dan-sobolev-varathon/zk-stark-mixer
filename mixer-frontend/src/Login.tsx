@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { verifyPassword } from './utils/PasswordVerification';
 import { invoke } from '@tauri-apps/api';
-import { getUsers, IUser } from './utils/IndexedDB';
+import { getIndexes, getUsers, IIndex, IUser } from './utils/IndexedDB';
 
 const Login: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -13,12 +13,14 @@ const Login: React.FC = () => {
     if (await verifyPassword(password)) {
       let users: IUser[] = await getUsers();
       let addresses = users.map(x => x.addr);
+      let indexes = await getIndexes();
       try{
-        await invoke('activate_accounts', {addresses: addresses, password: password});
+        await invoke('activate_accounts', {addresses: addresses, password: password, indexes: indexes});
       }
       catch(e){
         console.error('Error in activate_accounts', e);
       }
+      console.log("3")
       navigate('/entry');
 
       setPassword('');

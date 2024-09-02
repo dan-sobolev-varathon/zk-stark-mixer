@@ -57,7 +57,8 @@ export const useTransactions = (userId: HexString | undefined) => {
     };
 
     if (isFirstRead) {
-      void firstRead();
+      // void firstRead();
+      queueRef.current.add(() => firstRead());
       setIsFirstRead(false);
     }
 
@@ -89,8 +90,9 @@ export const useTransactions = (userId: HexString | undefined) => {
     const subscribeToEvents = async () => {
       const unsub = gearApi.gearEvents.subscribeToGearEvent(
         "UserMessageSent",
-        async (event) => {
-          await handleEvent(event);
+        (event) => {
+          queueRef.current.add(() => handleEvent(event));
+          // await handleEvent(event);
         });
       unsubs.push(unsub);
     };

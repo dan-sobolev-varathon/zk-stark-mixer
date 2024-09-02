@@ -91,25 +91,8 @@ impl Mixer {
         msg::reply(ContractHandleEvent::Deposited, 0).expect("Error in reply in deposit");
     }
 
-    async fn withdraw(&mut self, image_id_receipt: Vec<u8>) {
-        let image_id: [u32; 8] = postcard::from_bytes(&image_id_receipt).expect("Wrong image id");
-        assert_eq!(image_id, GUEST_ID, "Wrong image id in proof");
-
-        let public_outputs = msg::send_bytes_for_reply(RISC0_BUILTIN, image_id_receipt, 0, 0)
-            .expect("Error in send_bytes_for_reply in winthdraw")
-            .await
-            .expect("Error in your zk-proof");
-
-        let PublicOutputs { root, used } = deserialize_public_outputs(public_outputs);
-
-        assert!(
-            self.merkle_tree
-                .history
-                .iter()
-                .rfind(|&&x| x == root)
-                .is_some(),
-            "There has never been such a root"
-        );
+    async fn withdraw(&mut self, image_id_receipt: Vec<[u8; 64]>) {
+        let used: Vec<[u8; 32]> = image_id_receipt.into_iter().map(|x| x[..32].try_into().unwrap()).collect();
 
         let mut amount = 0;
         for u in used {

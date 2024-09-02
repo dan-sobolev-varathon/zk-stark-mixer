@@ -36,7 +36,7 @@ async fn set_derived_key(password: String) -> Result<[u8; 32], Box<dyn Error>>{
     Ok(derived_key)
 }
 
-pub async fn activate_accounts(addresses: Vec<String>, password: String) -> Result<(), Box<dyn Error>>{
+pub async fn activate_accounts(addresses: Vec<String>, password: String, indexes: Vec<u32>) -> Result<(), Box<dyn Error>>{
     let derived_key = set_derived_key(password).await?;
     let mut guard = ACCOUNTS.lock().await;
     for addr in addresses{
@@ -48,7 +48,7 @@ pub async fn activate_accounts(addresses: Vec<String>, password: String) -> Resu
         guard.insert(addr, gear_api);
     }
 
-    mixing_handling::activate_mixing().await?;
+    mixing_handling::activate_mixing(indexes).await?;
 
     Ok(())
 }

@@ -19,7 +19,7 @@ impl Metadata for ProgramMetadata {
 #[derive(Clone, Encode, Decode, TypeInfo)]
 pub enum ContractHandleAction {
     Deposit { hashes: Vec<[u8; 32]> },
-    Withdraw { image_id_receipt: Vec<[u8; 64]> },
+    Withdraw { image_id_receipt: Vec<u8> },
 }
 
 #[derive(Encode, Decode, TypeInfo)]

@@ -5,6 +5,8 @@ import { ApiBase, UnsubscribePromise } from '@polkadot/api/types';
 import { MIXING_CONTRACT_ADDRESS, MIXING_META } from './consts';
 import { hexToU8a } from '@polkadot/util';
 import { gearApiContext } from './context';
+import { removeIndexes } from './utils/IndexedDB';
+import PQueue from 'p-queue';
 
 type ByteArray32 = [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number];
 
@@ -15,6 +17,7 @@ export const useMixingAmount = () => {
     const [from, setFrom] = useState<number | undefined>(undefined);
     const fromRef = useRef(from);
     const [isFirstRead, setIsFirstRead] = useState(true);
+    const queueRef = useRef(new PQueue({ concurrency: 1 }));
 
     const gearApi = useContext(gearApiContext);
 
@@ -63,16 +66,18 @@ export const useMixingAmount = () => {
             const result = codecState.toJSON() as { withdrawn: { res: string[] } };
 
             let data = result.withdrawn.res.map(a => Array.from(hexToU8a(a)) as ByteArray32);
-            const amount: number = await invoke('check_mixing', { data: data });
+            const [amount, removed]: [number, number[]] = await invoke('check_mixing', { data: data });
             if (mixingAmount !== amount) {
                 setMixingAmount(amount);
                 localStorage.setItem('mixingAmount', amount.toString());
             }
             setFrom(prev => prev! + result.withdrawn.res.length);
+            await removeIndexes(removed);
         };
 
         if (isFirstRead) {
-            void firstRead();
+            // void firstRead();
+            queueRef.current.add(() => firstRead());
             setIsFirstRead(false);
         }
 
@@ -87,12 +92,13 @@ export const useMixingAmount = () => {
                 );
                 const result = codecState.toJSON() as { withdrawn: { res: string[] } };
                 let data = result.withdrawn.res.map(a => Array.from(hexToU8a(a)) as ByteArray32);
-                const amount = await invoke('check_mixing', { data: data }) as number;
+                const [amount, removed]: [number, number[]] = await invoke('check_mixing', { data: data });
                 if (mixingAmount !== amount) {
                     setMixingAmount(amount);
                     localStorage.setItem('mixingAmount', amount.toString());
                 }
                 setFrom(prev => prev! + result.withdrawn.res.length);
+                await removeIndexes(removed);
             }
         };
 
@@ -101,8 +107,9 @@ export const useMixingAmount = () => {
         const subscribeToEvents = async () => {
             const unsub = gearApi.gearEvents.subscribeToGearEvent(
                 "MessagesDispatched",
-                async (data) => {
-                    await handleEvent(data);
+                (data) => {
+                    // await handleEvent(data);
+                    queueRef.current.add(() => handleEvent(data));
                 }
             );
             unsubs.push(unsub);

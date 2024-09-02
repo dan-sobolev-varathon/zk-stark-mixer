@@ -23,7 +23,8 @@
     "src/UserPage.tsx",
     "src/UserPage1.tsx",
     "src/useMixingAmount.tsx",
-    "src/useTransactions.tsx"
+    "src/useTransactions.tsx",
+    "src/useBalance.tsx"
   ],
 
   "settings": {

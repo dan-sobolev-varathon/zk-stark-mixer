@@ -1,10 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-const KEYRING_SERVICE: &str = "dgluihf";
-const MIXING_SERVICE: &str = "sddsfgdgf";
+const KEYRING_SERVICE: &str = "dggrluihf";
 
-const CONTRACT: ActorId = ActorId(hex_literal::hex!("39c7c96207c1cf7eb016ada27cc013e83f22fbc89c5f5f83bdb9183e3ae528e5"));
+const CONTRACT: ActorId = ActorId(hex_literal::hex!("dc8d482cfc686258091f7bdea2854b8a470a921ebffaf751313316f1d422cf38"));
 
 mod crypto;
 
@@ -23,18 +22,23 @@ lazy_static! {
 }
 
 #[tauri::command]
-async fn deposit(addr: String, amount: u32) -> Result<(), String>{
-    mixing_handling::deposit(addr, amount).await.map_err(|e| e.to_string())
+async fn withdraw(addr: String, amount: u32) -> Result<(), String>{
+    mixing_handling::withdraw(addr, amount).await.map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-async fn check_mixing(data: Vec<[u8; 32]>) -> Result<u32, String>{
+async fn deposit(addr: String, amount: u32, shift: u32) -> Result<Vec<u32>, String>{
+    mixing_handling::deposit(addr, amount, shift).await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn check_mixing(data: Vec<[u8; 32]>) -> Result<(u32, Vec<u32>), String>{
     mixing_handling::check_mixing(data).await.map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-async fn activate_accounts(addresses: Vec<String>, password: String) -> Result<(), String>{
-    account_handling::activate_accounts(addresses, password).await.map_err(|e| e.to_string())
+async fn activate_accounts(addresses: Vec<String>, password: String, indexes: Vec<u32>) -> Result<(), String>{
+    account_handling::activate_accounts(addresses, password, indexes).await.map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -59,7 +63,7 @@ async fn get_all_accounts() -> Vec<String> {
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_all_accounts, activate_accounts, create_new_account, export_account, import_account, check_mixing, deposit])
+        .invoke_handler(tauri::generate_handler![get_all_accounts, activate_accounts, create_new_account, export_account, import_account, check_mixing, deposit, withdraw])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
