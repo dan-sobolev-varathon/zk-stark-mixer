@@ -19,9 +19,7 @@
     "src/Login.tsx",
     "src/SignUp.tsx",
     "src/EntryPage.tsx",
-    "src/EntryPage1.tsx",
     "src/UserPage.tsx",
-    "src/UserPage1.tsx",
     "src/useMixingAmount.tsx",
     "src/useTransactions.tsx",
     "src/useBalance.tsx"

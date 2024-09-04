@@ -34,7 +34,7 @@ keyring = "2.3.3"
 
 rs_merkle = { git = "https://github.com/dan-sobolev-varathon/rs-merkle-fork", rev = "83fc54f", default-features = false }
 
-risc0-zkvm = "1.0"
+risc0-zkvm = {version = "1.0", features = ["prove"] }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

@@ -158,6 +158,10 @@ extern "C" fn state() {
     let payload: StatePayload = msg::load().expect("Error in decoding payload in state function");
     let mixer = unsafe { MIXER.take().unwrap_or_default() };
     match payload {
+        StatePayload::Root => {
+            let res = mixer.merkle_tree.root().unwrap_or_default();
+            msg::reply(StateOutput::Root {res}, 0).expect("Failed to share state");
+        }
         StatePayload::Leaves => {
             let res = mixer.merkle_tree.leaves().unwrap_or_default();
             msg::reply(StateOutput::Leaves { res }, 0).expect("Failed to share state");

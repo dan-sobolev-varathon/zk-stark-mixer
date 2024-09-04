@@ -1,9 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-const KEYRING_SERVICE: &str = "dggrluihf";
+const KEYRING_SERVICE: &str = "dgegrluihf";
 
-const CONTRACT: ActorId = ActorId(hex_literal::hex!("dc8d482cfc686258091f7bdea2854b8a470a921ebffaf751313316f1d422cf38"));
+const CONTRACT: ActorId = ActorId(hex_literal::hex!("bf45de3c47839b3b32af31d754662f4cd71a549bc09109610ac9f339784f5911"));
 
 mod crypto;
 

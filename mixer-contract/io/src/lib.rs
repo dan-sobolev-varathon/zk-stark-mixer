@@ -31,6 +31,7 @@ pub enum ContractHandleEvent {
 
 #[derive(Encode, Decode, TypeInfo)]
 pub enum StatePayload {
+    Root,
     Leaves,
     Withdrawn{from: u64},
     WithdrawnAll,
@@ -47,6 +48,9 @@ pub struct TransactionInfo {
 
 #[derive(Encode, Decode, TypeInfo)]
 pub enum StateOutput {
+    Root{
+        res: [u8; 32],
+    },
     Leaves {
         res: Vec<[u8; 32]>,
     },
