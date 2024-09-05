@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Login';
 import SignUp from './SignUp';
-import EntryPage from './EntryPage.tsx';
-import UserPage from './UserPage';
 import { gearApiContext } from './context';
 import { GearApi } from '@gear-js/api';
+import OutletPage from './OutletPage.tsx';
+import TablePage from './TablePage.tsx';
+import MainPage from './MainPage.tsx';
 
 const useGearApi = (providerAddress: string) => {
   const [gearApi, setGearApi] = useState<GearApi>();
@@ -21,9 +22,8 @@ const useGearApi = (providerAddress: string) => {
     void initializeGearApi();
 
     return () => {
-      // Cleanup if necessary
       if (gearApi !== undefined) {
-        gearApi.disconnect(); // Or any other cleanup required
+        gearApi.disconnect();
       }
     };
   }, [providerAddress]);
@@ -42,8 +42,9 @@ const App: React.FC = () => {
           <Route path="/" element={checkPasswordSet() ? <Navigate to="/login" /> : <Navigate to="/signup" />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/entry" element={<EntryPage />} />
-          <Route path="/user/:userId" element={<UserPage />} />
+          <Route path="/entry" element={<MainPage />}>
+            <Route path="user/:userId" element={<TablePage />} />
+          </Route>
         </Routes>
       </Router>
     </gearApiContext.Provider>

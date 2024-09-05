@@ -2,12 +2,12 @@ use std::error::Error;
 
 use gclient::ext::sp_core::hashing::sha2_256;
 use keyring::Entry;
-use parity_scale_codec::Encode;
+use parity_scale_codec::{Decode, Encode};
 use utils::{make_proof, ContractHandleAction, StateOutput, StatePayload};
 
-use crate::{ACCOUNTS, CONTRACT, DERIVED_KEY, KEYRING_SERVICE, MIXING};
+use crate::{ACCOUNTS, CONTRACT, DERIVED_KEY, KEYRING_SERVICE, MIXING, SALT};
 
-use super::account_handling;
+use super::account_handling::{self, utils::{decrypt_string, encrypt_bytes_with_salt_and_derived_key}};
 
 mod utils;
 mod methods;
@@ -56,8 +56,12 @@ pub async fn deposit(addr: String, amount: u32, mut shift: u32) -> Result<Vec<u3
         hash_data.push(hd);
     }
     let payload = ContractHandleAction::Deposit { hashes: hash_data }.encode(); 
-    let guard = ACCOUNTS.lock().await;
-    let gear_api = guard.get(&addr).unwrap();
+
+    let gear_api;
+    {
+        let guard = ACCOUNTS.lock().await;
+        gear_api = guard.get(&addr).unwrap().clone();
+    }
 
     let value = amount as u128 * VARA_UNIT;
 
@@ -95,8 +99,12 @@ pub async fn withdraw(addr: String, amount: u32) -> Result<(), Box<dyn Error>>{
     }
     let taken_elements: Vec<[u8; 64]> = guard.iter().take(size as usize).map(|(&k, &v)| v.0).collect();
 
-    let guard_acc = ACCOUNTS.lock().await;
-    let gear_api = guard_acc.get(&addr).unwrap();
+    let gear_api;
+    {
+        let guard = ACCOUNTS.lock().await;
+        gear_api = guard.get(&addr).unwrap().clone();
+    }
+
     let output: StateOutput = gear_api.read_state(CONTRACT.into(), StatePayload::Leaves.encode()).await?;
     let leaves = match output {
         StateOutput::Leaves { res } => res,
@@ -117,3 +125,36 @@ pub async fn withdraw(addr: String, amount: u32) -> Result<(), Box<dyn Error>>{
 
     Ok(())
 }
+
+pub async fn export_mixing(amount: u32) -> Result<String, Box<dyn Error>>{
+    if amount % 10 != 0{
+        Err("Wrong amount, must be amount % 10")?;
+    }
+    let size = amount / 10;
+    let guard = MIXING.lock().await;
+    if guard.len() < size as usize{
+        Err("You don't have so much mixing amount")?;
+    }
+    let taken_elements: Vec<[u8; 64]> = guard.iter().take(size as usize).map(|(&k, &v)| v.0).collect();
+    let encrypted_str = encrypt_bytes_with_salt_and_derived_key(&taken_elements.encode(), &*SALT.lock().await, &*DERIVED_KEY.lock().await)?;
+
+    Ok(encrypted_str)
+}
+
+pub async fn import_mixing(encrypted_str: String, password: String, mut shift: u32) -> Result<(u32, Vec<u32>), Box<dyn Error>>{
+    let elems = Vec::<[u8; 64]>::decode(&mut &decrypt_string(&encrypted_str, &password).unwrap()[..]).unwrap();
+    let mut guard = MIXING.lock().await;
+
+    let derived_key = *DERIVED_KEY.lock().await;
+    let mut added = Vec::new();
+    for elem in elems{
+        if let std::collections::hash_map::Entry::Vacant(mut entry) = guard.entry(elem[..32].try_into().unwrap()){
+            Entry::new(KEYRING_SERVICE, &shift.to_string())?.set_password(&account_handling::utils::encrypt_bytes_derived_key(&elem, &derived_key)?)?;
+            entry.insert((elem, shift));
+            added.push(shift);
+            shift += 1;
+        }
+    }
+
+    Ok((guard.len() as u32, added))
+}   

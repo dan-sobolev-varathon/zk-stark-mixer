@@ -22,7 +22,7 @@ export const useTransactions = (userId: HexString | undefined) => {
 
     const init = async () => {
       const all_transactions = await getTransactions(userId);
-      setTransactions((prev) => [...prev, ...all_transactions]);
+      setTransactions(all_transactions);
       setFrom(all_transactions.length);
       fromRef.current = all_transactions.length;
 
@@ -31,7 +31,7 @@ export const useTransactions = (userId: HexString | undefined) => {
     };
 
     void init();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (!from) return;
@@ -106,7 +106,7 @@ export const useTransactions = (userId: HexString | undefined) => {
         });
       }
     };
-  }, [gearApi, isInitialized]);
+  }, [gearApi, isInitialized, userId]);
 
   return { transactions };
 };

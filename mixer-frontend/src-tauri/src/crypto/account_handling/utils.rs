@@ -78,6 +78,22 @@ pub fn encrypt_bytes(bytes: &[u8], password: &str) -> Result<String, Box<dyn Err
     Ok(encrypted_str)
 }
 
+pub fn encrypt_bytes_with_salt_and_derived_key(bytes: &[u8], salt: &[u8], derived_key: &[u8]) -> Result<String, Box<dyn Error>>{
+    sodiumoxide::init().expect("Failed to initialize sodiumoxide");
+    let nonce = secretbox::gen_nonce();
+    let secretbox_key = secretbox::Key::from_slice(&derived_key).ok_or("Invalid key length")?;
+    let ciphertext = secretbox::seal(bytes, &nonce, &secretbox_key);
+
+    let mut encrypted = Vec::new();
+    encrypted.extend_from_slice(&salt);
+    encrypted.extend_from_slice(nonce.as_ref());
+    encrypted.extend_from_slice(&ciphertext);
+
+    let encrypted_str = base64::encode(encrypted);
+
+    Ok(encrypted_str)
+}
+
 pub fn decrypt_string(s: &str, password: &str) -> Result<Vec<u8>, Box<dyn Error>>{
     let encrypted = base64::decode(s)?;
 

@@ -166,6 +166,10 @@ extern "C" fn state() {
             let res = mixer.merkle_tree.leaves().unwrap_or_default();
             msg::reply(StateOutput::Leaves { res }, 0).expect("Failed to share state");
         }
+        StatePayload::LeavesLen => {
+            let res = mixer.merkle_tree.leaves().unwrap_or_default().len() as u64;
+            msg::reply(StateOutput::LeavesLen { res }, 0).expect("Failed to share state");
+        }
         StatePayload::Withdrawn { from } => {
             let res = mixer.withdrawn_vec.get(from as usize..).unwrap_or_default().to_vec();
             msg::reply(StateOutput::Withdrawn { res }, 0).expect("Failed to share state");

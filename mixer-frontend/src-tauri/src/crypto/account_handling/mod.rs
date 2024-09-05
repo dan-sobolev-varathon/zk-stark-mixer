@@ -106,7 +106,9 @@ pub async fn import_account(json_encoded_pair: String, password: String) -> Resu
     Entry::new(KEYRING_SERVICE, &addr)?.set_password(&encrypt_bytes_derived_key(&secret_key, &derived_key)?)?;
 
     let gear_api = GearApi::dev().await?.with(pair)?;
-    ACCOUNTS.lock().await.insert(addr.clone(), gear_api);
+    if let Some(_) = ACCOUNTS.lock().await.insert(addr.clone(), gear_api){
+        Err("Such account already exist")?;
+    }
 
     Ok((addr, ss58, name))
 }

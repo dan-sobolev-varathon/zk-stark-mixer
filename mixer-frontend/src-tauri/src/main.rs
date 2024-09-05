@@ -3,7 +3,7 @@
 
 const KEYRING_SERVICE: &str = "dgegrluihf";
 
-const CONTRACT: ActorId = ActorId(hex_literal::hex!("bf45de3c47839b3b32af31d754662f4cd71a549bc09109610ac9f339784f5911"));
+const CONTRACT: ActorId = ActorId(hex_literal::hex!("ccc792af923148e3fc0a00940dcdd1f1d4f042e3f7469642f09747d28830abfc"));
 
 mod crypto;
 
@@ -19,6 +19,16 @@ lazy_static! {
     static ref DERIVED_KEY: Mutex<[u8; 32]> = Mutex::new([0; 32]);
     static ref ACCOUNTS: Mutex<HashMap<String, GearApi>> = Mutex::new(HashMap::new());
     static ref MIXING: Mutex<HashMap<[u8; 32], ([u8; 64], u32)>> = Mutex::new(HashMap::new());
+}
+
+#[tauri::command]
+async fn import_mixing(encrypted_str: String, password: String, shift: u32) -> Result<(u32, Vec<u32>), String>{
+    mixing_handling::import_mixing(encrypted_str, password, shift).await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn export_mixing(amount: u32) -> Result<String, String>{
+    mixing_handling::export_mixing(amount).await.map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -63,7 +73,7 @@ async fn get_all_accounts() -> Vec<String> {
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_all_accounts, activate_accounts, create_new_account, export_account, import_account, check_mixing, deposit, withdraw])
+        .invoke_handler(tauri::generate_handler![get_all_accounts, activate_accounts, create_new_account, export_account, import_account, check_mixing, deposit, withdraw, import_mixing, export_mixing])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

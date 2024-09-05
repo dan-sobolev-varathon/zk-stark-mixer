@@ -22,7 +22,13 @@
     "src/UserPage.tsx",
     "src/useMixingAmount.tsx",
     "src/useTransactions.tsx",
-    "src/useBalance.tsx"
+    "src/useBalance.tsx",
+    "src/TablePage.tsx",
+    "src/MainPage.tsx",
+    "src/OutletPage.tsx",
+    "src/UserButton.tsx",
+    "src/useTimer.tsx",
+    "consts.ts"
   ],
 
   "settings": {

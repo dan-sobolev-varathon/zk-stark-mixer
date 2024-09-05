@@ -33,6 +33,7 @@ pub enum ContractHandleEvent {
 pub enum StatePayload {
     Root,
     Leaves,
+    LeavesLen,
     Withdrawn{from: u64},
     WithdrawnAll,
     HistoryOneFrom{user: ActorId, from: u64},
@@ -53,6 +54,9 @@ pub enum StateOutput {
     },
     Leaves {
         res: Vec<[u8; 32]>,
+    },
+    LeavesLen{
+        res: u64,
     },
     Withdrawn {
         res: Vec<[u8; 32]>,

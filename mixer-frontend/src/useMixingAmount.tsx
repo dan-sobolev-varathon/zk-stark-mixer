@@ -10,8 +10,10 @@ import PQueue from 'p-queue';
 
 type ByteArray32 = [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number];
 
-export const useMixingAmount = () => {
+export const useMixingAmount = (reinit: boolean) => {
     const [mixingAmount, setMixingAmount] = useState<number | undefined>(undefined);
+    const [anonimityAmount, setAnonimityAmount] = useState<number | undefined>(undefined);
+    
     const [isInitialized, setIsInitialized] = useState(false);
     const [meta, setMeta] = useState<ProgramMetadata | undefined>(undefined);
     const [from, setFrom] = useState<number | undefined>(undefined);
@@ -53,12 +55,21 @@ export const useMixingAmount = () => {
         };
 
         void init();
-    }, []);
+    }, [reinit]);
 
     useEffect(() => {
         if (!isInitialized || gearApi === undefined || from === undefined || meta === undefined) return;
 
         const firstRead = async () => {
+            const lencodecState = await gearApi.programState.read(
+                { programId: MIXING_CONTRACT_ADDRESS, payload: { LeavesLen: {}} },
+                meta
+            );
+            const lenres = lencodecState.toJSON() as { leavesLen: { res: number } };
+            if(anonimityAmount !== lenres.leavesLen.res){
+                setAnonimityAmount(lenres.leavesLen.res);
+            }
+
             const codecState = await gearApi.programState.read(
                 { programId: MIXING_CONTRACT_ADDRESS, payload: { Withdrawn: { from: fromRef.current } } },
                 meta
@@ -86,6 +97,15 @@ export const useMixingAmount = () => {
             const isAnyChange = changedIDs.some(id => id === MIXING_CONTRACT_ADDRESS);
 
             if (isAnyChange) {
+                const lencodecState = await gearApi.programState.read(
+                    { programId: MIXING_CONTRACT_ADDRESS, payload: { LeavesLen: {}} },
+                    meta
+                );
+                const lenres = lencodecState.toJSON() as { leavesLen: { res: number } };
+                if(anonimityAmount !== lenres.leavesLen.res){
+                    setAnonimityAmount(lenres.leavesLen.res);
+                }
+
                 const codecState = await gearApi.programState.read(
                     { programId: MIXING_CONTRACT_ADDRESS, payload: { Withdrawn: { from: fromRef.current } } },
                     meta
@@ -126,5 +146,5 @@ export const useMixingAmount = () => {
         };
     }, [gearApi, isInitialized]);
 
-    return { mixingAmount };
+    return { mixingAmount, anonimityAmount };
 };
