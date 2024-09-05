@@ -43,6 +43,10 @@ pub async fn check_mixing(data: Vec<[u8; 32]>) -> Result<(u32, Vec<u32>), Box<dy
 }
 
 pub async fn deposit(addr: String, amount: u32, mut shift: u32) -> Result<Vec<u32>, Box<dyn Error>>{
+    let contract;
+    {
+        contract = *CONTRACT.lock().await;
+    }
     if amount % 10 != 0{
         Err("Wrong amount, must be amount % 10")?;
     }
@@ -65,7 +69,7 @@ pub async fn deposit(addr: String, amount: u32, mut shift: u32) -> Result<Vec<u3
 
     let value = amount as u128 * VARA_UNIT;
 
-    let gas_info = gear_api.calculate_handle_gas(None, CONTRACT.into(), payload.clone(), value, true).await?;
+    let gas_info = gear_api.calculate_handle_gas(None, contract.into(), payload.clone(), value, true).await?;
     let balance = gear_api.free_balance(gear_api.account_id()).await?;
     if gas_info.min_limit as u128 + value > balance{
         Err("Insufficient balance")?;
@@ -73,7 +77,7 @@ pub async fn deposit(addr: String, amount: u32, mut shift: u32) -> Result<Vec<u3
 
     let mut guard = MIXING.lock().await;
 
-    gear_api.send_message_bytes(CONTRACT.into(), payload, gas_info.min_limit, value).await?;
+    gear_api.send_message_bytes(contract.into(), payload, gas_info.min_limit, value).await?;
 
     let derived_key = *DERIVED_KEY.lock().await;
     
@@ -89,6 +93,11 @@ pub async fn deposit(addr: String, amount: u32, mut shift: u32) -> Result<Vec<u3
 }
 
 pub async fn withdraw(addr: String, amount: u32) -> Result<(), Box<dyn Error>>{
+    let contract;
+    {
+        contract = *CONTRACT.lock().await;
+    }
+
     if amount % 10 != 0{
         Err("Wrong amount, must be amount % 10")?;
     }
@@ -105,7 +114,7 @@ pub async fn withdraw(addr: String, amount: u32) -> Result<(), Box<dyn Error>>{
         gear_api = guard.get(&addr).unwrap().clone();
     }
 
-    let output: StateOutput = gear_api.read_state(CONTRACT.into(), StatePayload::Leaves.encode()).await?;
+    let output: StateOutput = gear_api.read_state(contract.into(), StatePayload::Leaves.encode()).await?;
     let leaves = match output {
         StateOutput::Leaves { res } => res,
         _ => unreachable!(),
@@ -115,13 +124,13 @@ pub async fn withdraw(addr: String, amount: u32) -> Result<(), Box<dyn Error>>{
 
     let payload = ContractHandleAction::Withdraw { image_id_receipt }.encode(); 
 
-    let gas_info = gear_api.calculate_handle_gas(None, CONTRACT.into(), payload.clone(), 0, true).await?;
+    let gas_info = gear_api.calculate_handle_gas(None, contract.into(), payload.clone(), 0, true).await?;
     let balance = gear_api.free_balance(gear_api.account_id()).await?;
     if gas_info.min_limit as u128 > balance{
         Err("Insufficient balance")?;
     }
 
-    gear_api.send_message_bytes(CONTRACT.into(), payload, gas_info.min_limit, 0).await?;
+    gear_api.send_message_bytes(contract.into(), payload, gas_info.min_limit, 0).await?;
 
     Ok(())
 }

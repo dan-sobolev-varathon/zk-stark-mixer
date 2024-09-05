@@ -109,7 +109,7 @@ pub fn make_proof(elems: &[[u8; 64]], leaves: &[[u8; 32]]) -> Result<Vec<u8>, Bo
 
     let env = ExecutorEnv::builder().write(&proof_bytes).unwrap().write(&indices_to_prove).unwrap().write(&elems).unwrap().write(&leaves.len()).unwrap().build().unwrap();
     let prover = default_prover();
-
+    
     let receipt = prover.prove(env, HELLO_GUEST_ELF).unwrap();
     println!("\nJournal: {:?}", receipt.receipt.journal);
     let image_id_receipt = postcard::to_allocvec(&(HELLO_GUEST_ID, receipt.receipt)).unwrap();

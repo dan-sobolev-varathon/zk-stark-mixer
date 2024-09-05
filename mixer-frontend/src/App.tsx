@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Login';
 import SignUp from './SignUp';
 import { gearApiContext } from './context';
 import { GearApi } from '@gear-js/api';
-import OutletPage from './OutletPage.tsx';
 import TablePage from './TablePage.tsx';
 import MainPage from './MainPage.tsx';
 

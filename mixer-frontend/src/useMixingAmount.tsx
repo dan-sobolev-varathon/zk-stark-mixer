@@ -2,15 +2,17 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { invoke } from "@tauri-apps/api/tauri";
 import { ProgramMetadata, MessagesDispatched } from '@gear-js/api';
 import { ApiBase, UnsubscribePromise } from '@polkadot/api/types';
-import { MIXING_CONTRACT_ADDRESS, MIXING_META } from './consts';
+// import { MIXING_CONTRACT_ADDRESS, MIXING_META } from './consts';
 import { hexToU8a } from '@polkadot/util';
 import { gearApiContext } from './context';
 import { removeIndexes } from './utils/IndexedDB';
 import PQueue from 'p-queue';
+import { MIXING_META } from './consts';
 
 type ByteArray32 = [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number];
 
 export const useMixingAmount = (reinit: boolean) => {
+
     const [mixingAmount, setMixingAmount] = useState<number | undefined>(undefined);
     const [anonimityAmount, setAnonimityAmount] = useState<number | undefined>(undefined);
     
@@ -62,7 +64,7 @@ export const useMixingAmount = (reinit: boolean) => {
 
         const firstRead = async () => {
             const lencodecState = await gearApi.programState.read(
-                { programId: MIXING_CONTRACT_ADDRESS, payload: { LeavesLen: {}} },
+                { programId: globalThis.MIXING_CONTRACT_ADDRESS, payload: { LeavesLen: {}} },
                 meta
             );
             const lenres = lencodecState.toJSON() as { leavesLen: { res: number } };
@@ -71,7 +73,7 @@ export const useMixingAmount = (reinit: boolean) => {
             }
 
             const codecState = await gearApi.programState.read(
-                { programId: MIXING_CONTRACT_ADDRESS, payload: { Withdrawn: { from: fromRef.current } } },
+                { programId: globalThis.MIXING_CONTRACT_ADDRESS, payload: { Withdrawn: { from: fromRef.current } } },
                 meta
             );
             const result = codecState.toJSON() as { withdrawn: { res: string[] } };
@@ -88,17 +90,17 @@ export const useMixingAmount = (reinit: boolean) => {
 
         if (isFirstRead) {
             // void firstRead();
-            queueRef.current.add(() => firstRead());
+            queueRef.current.add(async () => await firstRead());
             setIsFirstRead(false);
         }
 
         const handleEvent = async (data: MessagesDispatched) => {
             const changedIDs = data.data.stateChanges.toHuman() as string[];
-            const isAnyChange = changedIDs.some(id => id === MIXING_CONTRACT_ADDRESS);
+            const isAnyChange = changedIDs.some(id => id === globalThis.MIXING_CONTRACT_ADDRESS);
 
             if (isAnyChange) {
                 const lencodecState = await gearApi.programState.read(
-                    { programId: MIXING_CONTRACT_ADDRESS, payload: { LeavesLen: {}} },
+                    { programId: globalThis.MIXING_CONTRACT_ADDRESS, payload: { LeavesLen: {}} },
                     meta
                 );
                 const lenres = lencodecState.toJSON() as { leavesLen: { res: number } };
@@ -107,7 +109,7 @@ export const useMixingAmount = (reinit: boolean) => {
                 }
 
                 const codecState = await gearApi.programState.read(
-                    { programId: MIXING_CONTRACT_ADDRESS, payload: { Withdrawn: { from: fromRef.current } } },
+                    { programId: globalThis.MIXING_CONTRACT_ADDRESS, payload: { Withdrawn: { from: fromRef.current } } },
                     meta
                 );
                 const result = codecState.toJSON() as { withdrawn: { res: string[] } };
@@ -129,7 +131,7 @@ export const useMixingAmount = (reinit: boolean) => {
                 "MessagesDispatched",
                 (data) => {
                     // await handleEvent(data);
-                    queueRef.current.add(() => handleEvent(data));
+                    queueRef.current.add(async () => await handleEvent(data));
                 }
             );
             unsubs.push(unsub);

@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useContext } from 'react';
 import { getTransactions, addTransactions, ITransaction } from './utils/IndexedDB';
 import { HexString, ProgramMetadata, UserMessageSent } from '@gear-js/api';
-import { MIXING_CONTRACT_ADDRESS, MIXING_META } from './consts';
+// import { MIXING_CONTRACT_ADDRESS, MIXING_META } from './consts';
 import { gearApiContext } from './context';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import PQueue from 'p-queue';
+import { MIXING_META } from './consts';
 
 export const useTransactions = (userId: HexString | undefined) => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
@@ -19,6 +20,10 @@ export const useTransactions = (userId: HexString | undefined) => {
 
   useEffect(() => {
     if (!userId) return;
+
+    setTransactions([]);
+    setIsFirstRead(true);
+    setFrom(undefined);
 
     const init = async () => {
       const all_transactions = await getTransactions(userId);
@@ -42,7 +47,7 @@ export const useTransactions = (userId: HexString | undefined) => {
     if (!isInitialized || gearApi === undefined || fromRef.current === undefined || meta === undefined || userId === undefined) return;
 
     const firstRead = async () => {
-      const programId = MIXING_CONTRACT_ADDRESS;
+      const programId = globalThis.MIXING_CONTRACT_ADDRESS;
       const payload = { HistoryOneFrom: { user: userId, from: fromRef.current } };
 
       const codecState = await gearApi.programState.read({ programId, payload }, meta);
@@ -58,7 +63,7 @@ export const useTransactions = (userId: HexString | undefined) => {
 
     if (isFirstRead) {
       // void firstRead();
-      queueRef.current.add(() => firstRead());
+      queueRef.current.add(async () => await firstRead());
       setIsFirstRead(false);
     }
 
@@ -69,9 +74,9 @@ export const useTransactions = (userId: HexString | undefined) => {
       const destinationHex = destination.toHex();
       const sourceHex = source.toHex();
 
-      if (destinationHex !== userId || sourceHex !== MIXING_CONTRACT_ADDRESS) return;
+      if (destinationHex !== userId || sourceHex !== globalThis.MIXING_CONTRACT_ADDRESS) return;
 
-      const programId = MIXING_CONTRACT_ADDRESS;
+      const programId = globalThis.MIXING_CONTRACT_ADDRESS;
       const payload = { HistoryOneFrom: { user: destinationHex, from: fromRef.current } };
 
       const codecState = await gearApi.programState.read({ programId, payload }, meta);
@@ -91,7 +96,7 @@ export const useTransactions = (userId: HexString | undefined) => {
       const unsub = gearApi.gearEvents.subscribeToGearEvent(
         "UserMessageSent",
         (event) => {
-          queueRef.current.add(() => handleEvent(event));
+          queueRef.current.add(async () => await handleEvent(event));
           // await handleEvent(event);
         });
       unsubs.push(unsub);

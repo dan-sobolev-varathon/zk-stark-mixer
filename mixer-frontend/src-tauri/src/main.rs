@@ -3,7 +3,7 @@
 
 const KEYRING_SERVICE: &str = "dgegrluihf";
 
-const CONTRACT: ActorId = ActorId(hex_literal::hex!("ccc792af923148e3fc0a00940dcdd1f1d4f042e3f7469642f09747d28830abfc"));
+// const CONTRACT: ActorId = ActorId(hex_literal::hex!("ccc792af923148e3fc0a00940dcdd1f1d4f042e3f7469642f09747d28830abfc"));
 
 mod crypto;
 
@@ -15,6 +15,7 @@ use lazy_static::lazy_static;
 use tauri::async_runtime::Mutex;
 
 lazy_static! {
+    static ref CONTRACT: Mutex<ActorId> = Mutex::new(ActorId(hex_literal::hex!("ccc792af923148e3fc0a00940dcdd1f1d4f042e3f7469642f09747d28830abfc")));
     static ref SALT: Mutex<[u8; 32]> = Mutex::new([0; 32]);
     static ref DERIVED_KEY: Mutex<[u8; 32]> = Mutex::new([0; 32]);
     static ref ACCOUNTS: Mutex<HashMap<String, GearApi>> = Mutex::new(HashMap::new());
@@ -47,7 +48,8 @@ async fn check_mixing(data: Vec<[u8; 32]>) -> Result<(u32, Vec<u32>), String>{
 }
 
 #[tauri::command]
-async fn activate_accounts(addresses: Vec<String>, password: String, indexes: Vec<u32>) -> Result<(), String>{
+async fn activate_accounts(addresses: Vec<String>, password: String, indexes: Vec<u32>, contract: String) -> Result<(), String>{
+    *CONTRACT.lock().await = ActorId(hex::decode(contract).map_err(|e| e.to_string())?.try_into().map_err(|e| format!("Wrong hex contract string, {:?}", e).to_string())?);
     account_handling::activate_accounts(addresses, password, indexes).await.map_err(|e| e.to_string())
 }
 
