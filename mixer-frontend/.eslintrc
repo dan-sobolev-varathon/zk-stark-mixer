@@ -28,7 +28,8 @@
     "src/OutletPage.tsx",
     "src/UserButton.tsx",
     "src/useTimer.tsx",
-    "consts.ts"
+    "consts.ts",
+    "TableTransactions.tsx"
   ],
 
   "settings": {

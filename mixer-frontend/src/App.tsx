@@ -4,9 +4,9 @@ import Login from './Login';
 import SignUp from './SignUp';
 import { gearApiContext } from './context';
 import { GearApi } from '@gear-js/api';
-import OutletPage from './OutletPage.tsx';
 import TablePage from './TablePage.tsx';
 import MainPage from './MainPage.tsx';
+import TablePageWithKey from './TablePageWithKey.tsx';
 
 const useGearApi = (providerAddress: string) => {
   const [gearApi, setGearApi] = useState<GearApi>();
