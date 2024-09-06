@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom'; // Import navigate hook and useParams
-import { IUser } from './utils/IndexedDB';
-import { useBalance } from './useBalance'; // Custom hook to fetch the balance
+import { IUser } from '../../utils/IndexedDB';
+import { useBalance } from '../../hooks/useBalance'; // Custom hook to fetch the balance
 
 interface UserButtonProps {
     user: IUser;

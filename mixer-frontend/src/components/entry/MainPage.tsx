@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
-import { getUsers, IUser, addUser, getLastIndex, addIndexes } from './utils/IndexedDB';
+import { getUsers, IUser, addUser, getLastIndex, addIndexes } from '../../utils/IndexedDB';
 import { invoke } from '@tauri-apps/api/tauri';
 import { writeFile, createDir } from '@tauri-apps/api/fs';
 import { homeDir } from '@tauri-apps/api/path';
 import { HexString } from '@gear-js/api';
-import { useMixingAmount } from './useMixingAmount';
+import { useMixingAmount } from '../../hooks/useMixingAmount';
 import UserButton from './UserButton';
 
 const MainPage: React.FC = () => {
@@ -94,6 +94,12 @@ const MainPage: React.FC = () => {
             alert('Please enter a valid amount.');
             return;
         }
+
+        const a = localStorage.getItem('ongoingTransaction');
+        if(a === 'true'){
+            alert("Wait for completion");
+            return;
+        }
         
         try {
             // Call the Rust-side command to export mixing
@@ -122,6 +128,11 @@ const MainPage: React.FC = () => {
     const handleImportAmount = async () => {
         if (!importFile || !importPassword) {
             alert('Please enter both JSON file and password.');
+            return;
+        }
+        const a = localStorage.getItem('ongoingTransaction');
+        if(a === 'true'){
+            alert("Wait for completion");
             return;
         }
     
@@ -281,7 +292,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         overflow: 'hidden',
     },
     sidebar: {
-        width: '30vw', // Smaller sidebar width
+        width: '40vw', // Smaller sidebar width
         backgroundColor: '#f0f0f0',
         display: 'flex',
         flexDirection: 'column',
@@ -370,10 +381,10 @@ const styles: { [key: string]: React.CSSProperties } = {
         overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        padding: '10px', // Added padding for cleaner layout
     },
     topBar: {
         padding: '10px 0',
+        paddingLeft: '20px',
         backgroundColor: '#f0f0f0',
         fontSize: '15px',
         display: 'flex',

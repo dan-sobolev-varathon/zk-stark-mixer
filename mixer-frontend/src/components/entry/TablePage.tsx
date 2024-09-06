@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/tauri';
-import { useTransactions } from './useTransactions';
-import { HexString } from '@gear-js/api';
-import { addIndexes, getLastIndex } from './utils/IndexedDB';
+import { addIndexes, getLastIndex } from '../../utils/IndexedDB';
 import { useStopwatch } from 'react-timer-hook';
+import { HexString } from '@gear-js/api';
+import TableTransactions from './TableTransactions';
 
 const TablePage: React.FC = () => {
   const { userId } = useParams<{ userId: HexString }>();
-  const { transactions } = useTransactions(userId);
   const [depositAmount, setDepositAmount] = useState<number | null>(null);
   const [withdrawAmount, setWithdrawAmount] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +23,7 @@ const TablePage: React.FC = () => {
     setIsSubmitting(true);
     setOperation('deposit');
     localStorage.setItem('ongoingTransaction', 'true');
-    start(); // Start the stopwatch
+    start();
 
     try {
       const shift = await getLastIndex() + 1;
@@ -42,8 +41,10 @@ const TablePage: React.FC = () => {
     } finally {
       setIsSubmitting(false);
       setOperation(null);
-      pause(); // Stop the stopwatch
-      reset(); // Reset the stopwatch
+      setDepositAmount(null);
+      setWithdrawAmount(null);
+      pause();
+      reset();
     }
   };
 
@@ -55,7 +56,7 @@ const TablePage: React.FC = () => {
     setIsSubmitting(true);
     setOperation('withdraw');
     localStorage.setItem('ongoingTransaction', 'true');
-    start(); // Start the stopwatch
+    start();
 
     try {
       const startTime = new Date();
@@ -72,8 +73,10 @@ const TablePage: React.FC = () => {
     } finally {
       setIsSubmitting(false);
       setOperation(null);
-      pause(); // Stop the stopwatch
-      reset(); // Reset the stopwatch
+      setDepositAmount(null);
+      setWithdrawAmount(null);
+      pause();
+      reset();
     }
   };
 
@@ -87,7 +90,7 @@ const TablePage: React.FC = () => {
                 value={depositAmount ?? ''}
                 onChange={(e) => setDepositAmount(Number(e.target.value))}
                 style={styles.select}
-                disabled={isSubmitting && operation === 'withdraw'} // Disable if withdrawing
+                disabled={isSubmitting}
               >
                 <option value="" disabled>Amount</option>
                 <option value={10}>10</option>
@@ -97,7 +100,7 @@ const TablePage: React.FC = () => {
               </select>
               <button
                 onClick={handleDeposit}
-                disabled={isSubmitting && operation !== 'deposit'} // Disable if another operation
+                disabled={isSubmitting}
                 style={styles.button}
               >
                 {isSubmitting && operation === 'deposit' ? `Depositing... ${minutes}:${seconds}s` : 'Deposit'}
@@ -108,7 +111,7 @@ const TablePage: React.FC = () => {
                 value={withdrawAmount ?? ''}
                 onChange={(e) => setWithdrawAmount(Number(e.target.value))}
                 style={styles.select}
-                disabled={isSubmitting && operation === 'deposit'} // Disable if depositing
+                disabled={isSubmitting}
               >
                 <option value="" disabled>Amount</option>
                 <option value={10}>10</option>
@@ -118,7 +121,7 @@ const TablePage: React.FC = () => {
               </select>
               <button
                 onClick={handleWithdraw}
-                disabled={isSubmitting && operation !== 'withdraw'} // Disable if another operation
+                disabled={isSubmitting}
                 style={styles.button}
               >
                 {isSubmitting && operation === 'withdraw' ? `Withdrawing... ${minutes}:${seconds}s` : 'Withdraw'}
@@ -128,28 +131,7 @@ const TablePage: React.FC = () => {
         </div>
       </div>
 
-      <div style={styles.transactionSection}>
-        <div style={styles.transactionColumn}>
-          <div style={styles.transactionList}>
-            {transactions.filter(tx => tx.amount > 0).map((tx, index) => (
-              <div key={index} style={styles.transactionItem}>
-                <p>Amount: <span style={styles.amountText}>+{tx.amount * 10}</span></p>
-                <p>Time: <span style={styles.timeText}>{new Date(tx.time).toLocaleString()}</span></p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div style={styles.transactionColumn}>
-          <div style={styles.transactionList}>
-            {transactions.filter(tx => tx.amount <= 0).map((tx, index) => (
-              <div key={index} style={styles.transactionItem}>
-                <p>Amount: <span style={styles.amountText}>{tx.amount * 10}</span></p>
-                <p>Time: <span style={styles.timeText}>{new Date(tx.time).toLocaleString()}</span></p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <TableTransactions key={userId} userId={userId} /> {/* Pass userId to the new component */}
     </div>
   );
 };
@@ -215,47 +197,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     transition: 'background-color 0.3s, transform 0.2s',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     width: '100px',
-  },
-  transactionSection: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: '10px',
-    flex: 1,
-    marginTop: '10px',
-    overflow: 'hidden',
-  },
-  transactionColumn: {
-    flex: 1,
-    overflowY: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#ffffff',
-    borderRadius: '8px',
-    padding: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  },
-  transactionList: {
-    flex: 1,
-    overflowY: 'auto',
-  },
-  transactionItem: {
-    marginBottom: '10px',
-    paddingBottom: '5px',
-    borderBottom: '1px solid #dddddd',
-    fontSize: '12px', // Match font size with select and button
-  },
-  amountText: {
-    color: '#00aaff',
-    fontWeight: '600',
-  },
-  timeText: {
-    color: '#666666',
-  },
-  subheading: {
-    fontSize: '1.1rem',
-    color: '#000000',
-    marginBottom: '10px',
-    textAlign: 'center',
   },
 };
 

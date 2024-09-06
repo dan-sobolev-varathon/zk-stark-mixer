@@ -43,10 +43,7 @@ pub async fn check_mixing(data: Vec<[u8; 32]>) -> Result<(u32, Vec<u32>), Box<dy
 }
 
 pub async fn deposit(addr: String, amount: u32, mut shift: u32) -> Result<Vec<u32>, Box<dyn Error>>{
-    let contract;
-    {
-        contract = *CONTRACT.lock().await;
-    }
+    let contract = CONTRACT;
     if amount % 10 != 0{
         Err("Wrong amount, must be amount % 10")?;
     }
@@ -93,10 +90,7 @@ pub async fn deposit(addr: String, amount: u32, mut shift: u32) -> Result<Vec<u3
 }
 
 pub async fn withdraw(addr: String, amount: u32) -> Result<(), Box<dyn Error>>{
-    let contract;
-    {
-        contract = *CONTRACT.lock().await;
-    }
+    let contract = CONTRACT;
 
     if amount % 10 != 0{
         Err("Wrong amount, must be amount % 10")?;
@@ -106,7 +100,7 @@ pub async fn withdraw(addr: String, amount: u32) -> Result<(), Box<dyn Error>>{
     if guard.len() < size as usize{
         Err("You don't have so much mixing amount")?;
     }
-    let taken_elements: Vec<[u8; 64]> = guard.iter().take(size as usize).map(|(&k, &v)| v.0).collect();
+    let taken_elements: Vec<[u8; 64]> = guard.iter().take(size as usize).map(|(_, &v)| v.0).collect();
 
     let gear_api;
     {
@@ -144,7 +138,7 @@ pub async fn export_mixing(amount: u32) -> Result<String, Box<dyn Error>>{
     if guard.len() < size as usize{
         Err("You don't have so much mixing amount")?;
     }
-    let taken_elements: Vec<[u8; 64]> = guard.iter().take(size as usize).map(|(&k, &v)| v.0).collect();
+    let taken_elements: Vec<[u8; 64]> = guard.iter().take(size as usize).map(|(_, &v)| v.0).collect();
     let encrypted_str = encrypt_bytes_with_salt_and_derived_key(&taken_elements.encode(), &*SALT.lock().await, &*DERIVED_KEY.lock().await)?;
 
     Ok(encrypted_str)
@@ -157,7 +151,7 @@ pub async fn import_mixing(encrypted_str: String, password: String, mut shift: u
     let derived_key = *DERIVED_KEY.lock().await;
     let mut added = Vec::new();
     for elem in elems{
-        if let std::collections::hash_map::Entry::Vacant(mut entry) = guard.entry(elem[..32].try_into().unwrap()){
+        if let std::collections::hash_map::Entry::Vacant(entry) = guard.entry(elem[..32].try_into().unwrap()){
             Entry::new(KEYRING_SERVICE, &shift.to_string())?.set_password(&account_handling::utils::encrypt_bytes_derived_key(&elem, &derived_key)?)?;
             entry.insert((elem, shift));
             added.push(shift);

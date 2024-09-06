@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { HexString } from '@gear-js/api';
-import { gearApiContext } from './context';
+import { gearApiContext } from '../context';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import { Balance } from '@polkadot/types/interfaces';
 import { formatBalance } from '@polkadot/util';

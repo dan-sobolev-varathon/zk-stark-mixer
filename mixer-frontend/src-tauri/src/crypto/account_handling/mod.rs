@@ -1,8 +1,8 @@
 pub mod utils;
 
-use std::{collections::HashMap, error::Error};
+use std::error::Error;
 
-use crate::{KEYRING_SERVICE, SALT, DERIVED_KEY, ACCOUNTS, MIXING};
+use crate::{KEYRING_SERVICE, SALT, DERIVED_KEY, ACCOUNTS};
 
 use utils::{decode_pair_from_encrypted_json, decrypt_string, decrypt_string_derived_key, derive_key, encode_pair_with_salt_and_derived_key, encrypt_bytes, encrypt_bytes_derived_key, generate_salt};
 use gclient::{ext::{sp_core::{crypto::Ss58Codec, sr25519, Pair}, sp_runtime::AccountId32}, GearApi};

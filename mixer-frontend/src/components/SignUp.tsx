@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { encryptMarkerWithPassphrase } from './utils/PasswordVerification';
+import { encryptMarkerWithPassphrase } from '../utils/PasswordVerification';
 
 const SignUp: React.FC = () => {
   const [password, setPassword] = useState('');
