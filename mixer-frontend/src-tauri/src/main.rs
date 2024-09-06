@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-const KEYRING_SERVICE: &str = "dgegrluihf";
+const KEYRING_SERVICE: &str = "ZK-STARK-MIXER";
 
 // const CONTRACT: ActorId = ActorId(hex_literal::hex!("ccc792af923148e3fc0a00940dcdd1f1d4f042e3f7469642f09747d28830abfc"));
 

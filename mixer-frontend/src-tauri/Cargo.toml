@@ -21,7 +21,7 @@ scrypt = "0.6"
 base64 = "0.13" 
 
 
-gclient = {path="/home/coolman/gear/gclient"}
+gclient = {git = "https://github.com/dan-sobolev-varathon/gear-fork", branch = "risc0-builtin"}
 hex-literal = "0.4.1"
 hex = "0.4.1"
 parity-scale-codec = "3.6.12"

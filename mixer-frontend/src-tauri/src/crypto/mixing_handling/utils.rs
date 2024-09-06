@@ -2,8 +2,8 @@ use std::error::Error;
 
 use gclient::{ext::sp_core::hashing::sha2_256, metadata::runtime_types::gprimitives::ActorId};
 use parity_scale_codec::{Decode, Encode};
-use risc0_zkvm::{default_prover, ExecutorEnv, Prover, ProverOpts};
-use rs_merkle::{MerkleProof, MerkleTree};
+use risc0_zkvm::{default_prover, ExecutorEnv};
+use rs_merkle::MerkleTree;
 
 use super::methods::{HELLO_GUEST_ELF, HELLO_GUEST_ID};
 
@@ -100,10 +100,6 @@ pub fn make_proof(elems: &[[u8; 64]], leaves: &[[u8; 32]]) -> Result<Vec<u8>, Bo
     let (indices_to_prove, elems_to_prove) = indices_elems_to_prove(elems, leaves);
     let tree = MerkleTree::<DigestWrapper>::from_leaves(leaves);
     let proof_bytes = tree.proof(&indices_to_prove).to_bytes();
-    println!("\nRoot tree: {:?}", tree.root().unwrap());
-    println!("\nRoot proof: {:?}", tree.proof(&indices_to_prove).root(&indices_to_prove, &elems_to_prove.iter().map(|a| sha2_256(a)).collect::<Vec<_>>(), leaves.len()).unwrap());
-    // MerkleProof::try_from(vec![1u8,2,3,4,5]);
-    // MerkleProof::root(&self, leaf_indices, leaf_hashes, total_leaves_count)
 
     let elems: Vec<RustShit> = elems_to_prove.iter().map(|a| RustShit(a[..32].try_into().unwrap(), a[32..].try_into().unwrap())).collect();
 
@@ -111,7 +107,6 @@ pub fn make_proof(elems: &[[u8; 64]], leaves: &[[u8; 32]]) -> Result<Vec<u8>, Bo
     let prover = default_prover();
     
     let receipt = prover.prove(env, HELLO_GUEST_ELF).unwrap();
-    println!("\nJournal: {:?}", receipt.receipt.journal);
     let image_id_receipt = postcard::to_allocvec(&(HELLO_GUEST_ID, receipt.receipt)).unwrap();
 
     Ok(image_id_receipt)

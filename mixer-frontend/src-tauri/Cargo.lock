@@ -2696,6 +2696,7 @@ dependencies = [
 [[package]]
 name = "gclient"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2802,6 +2803,7 @@ dependencies = [
 [[package]]
 name = "gear-core"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "blake2",
  "byteorder",
@@ -2827,6 +2829,7 @@ dependencies = [
 [[package]]
 name = "gear-core-errors"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "derive_more",
  "enum-iterator",
@@ -2837,6 +2840,7 @@ dependencies = [
 [[package]]
 name = "gear-node-wrapper"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "anyhow",
  "rand 0.8.5",
@@ -2847,6 +2851,7 @@ dependencies = [
 [[package]]
 name = "gear-ss58"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "blake2",
  "bs58",
@@ -2856,6 +2861,7 @@ dependencies = [
 [[package]]
 name = "gear-utils"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "env_logger",
  "gear-core",
@@ -2876,6 +2882,7 @@ checksum = "bbfbfa701dc65e683fcd2fb24f046bcef22634acbdf47ad14724637dc39ad05b"
 [[package]]
 name = "gear-wasm-instrument"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "derive_more",
  "enum-iterator",
@@ -3091,6 +3098,7 @@ dependencies = [
 [[package]]
 name = "gprimitives"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "derive_more",
  "gear-ss58",
@@ -3103,6 +3111,7 @@ dependencies = [
 [[package]]
 name = "gsdk"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "anyhow",
  "base64 0.21.7",
@@ -3133,6 +3142,7 @@ dependencies = [
 [[package]]
 name = "gsdk-codegen"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3142,6 +3152,7 @@ dependencies = [
 [[package]]
 name = "gsys"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 
 [[package]]
 name = "gtk"
@@ -4808,6 +4819,7 @@ dependencies = [
 [[package]]
 name = "numerated"
 version = "1.5.0"
+source = "git+https://github.com/dan-sobolev-varathon/gear-fork?branch=risc0-builtin#d92eb0249dad672305089e3e4217d4dfababd389"
 dependencies = [
  "derive_more",
  "num-traits",
@@ -7325,7 +7337,7 @@ dependencies = [
 [[package]]
 name = "sp-crypto-ec-utils"
 version = "0.10.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#b7d5f15aede020d65b2b9634e858dac863c0520a"
+source = "git+https://github.com/paritytech/polkadot-sdk#8d81f1e648a21d7d14f94bc86503d3c77ead5807"
 dependencies = [
  "ark-bls12-377",
  "ark-bls12-377-ext",
@@ -7355,7 +7367,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "14.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#b7d5f15aede020d65b2b9634e858dac863c0520a"
+source = "git+https://github.com/paritytech/polkadot-sdk#8d81f1e648a21d7d14f94bc86503d3c77ead5807"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7376,7 +7388,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.25.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#b7d5f15aede020d65b2b9634e858dac863c0520a"
+source = "git+https://github.com/paritytech/polkadot-sdk#8d81f1e648a21d7d14f94bc86503d3c77ead5807"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -7472,7 +7484,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "24.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#b7d5f15aede020d65b2b9634e858dac863c0520a"
+source = "git+https://github.com/paritytech/polkadot-sdk#8d81f1e648a21d7d14f94bc86503d3c77ead5807"
 dependencies = [
  "bytes",
  "impl-trait-for-tuples",
@@ -7503,7 +7515,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "17.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#b7d5f15aede020d65b2b9634e858dac863c0520a"
+source = "git+https://github.com/paritytech/polkadot-sdk#8d81f1e648a21d7d14f94bc86503d3c77ead5807"
 dependencies = [
  "Inflector",
  "expander",
@@ -7548,7 +7560,7 @@ source = "git+https://github.com/gear-tech/polkadot-sdk.git?branch=gear-v1.4.0#0
 [[package]]
 name = "sp-std"
 version = "14.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#b7d5f15aede020d65b2b9634e858dac863c0520a"
+source = "git+https://github.com/paritytech/polkadot-sdk#8d81f1e648a21d7d14f94bc86503d3c77ead5807"
 
 [[package]]
 name = "sp-storage"
@@ -7566,7 +7578,7 @@ dependencies = [
 [[package]]
 name = "sp-storage"
 version = "19.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#b7d5f15aede020d65b2b9634e858dac863c0520a"
+source = "git+https://github.com/paritytech/polkadot-sdk#8d81f1e648a21d7d14f94bc86503d3c77ead5807"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -7590,7 +7602,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "16.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#b7d5f15aede020d65b2b9634e858dac863c0520a"
+source = "git+https://github.com/paritytech/polkadot-sdk#8d81f1e648a21d7d14f94bc86503d3c77ead5807"
 dependencies = [
  "parity-scale-codec",
  "tracing",
@@ -7640,7 +7652,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "20.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#b7d5f15aede020d65b2b9634e858dac863c0520a"
+source = "git+https://github.com/paritytech/polkadot-sdk#8d81f1e648a21d7d14f94bc86503d3c77ead5807"
 dependencies = [
  "anyhow",
  "impl-trait-for-tuples",

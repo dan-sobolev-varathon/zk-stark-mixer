@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './Login';
-import SignUp from './SignUp';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Login.tsx';
+import SignUp from './components/SignUp.tsx';
 import { gearApiContext } from './context';
 import { GearApi } from '@gear-js/api';
-import TablePage from './TablePage.tsx';
-import MainPage from './MainPage.tsx';
+import TablePage from './components/entry/TablePage.tsx';
+import MainPage from './components/entry/MainPage.tsx';
 
 const useGearApi = (providerAddress: string) => {
   const [gearApi, setGearApi] = useState<GearApi>();
