@@ -34,6 +34,8 @@ const App: React.FC = () => {
   const checkPasswordSet = () => localStorage.getItem('passwordData') !== null;
   const gearApi = useGearApi('ws://localhost:9944');
 
+  console.log(gearApi);
+
   return (
     <gearApiContext.Provider value={gearApi}>
       <Router>

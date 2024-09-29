@@ -5,3 +5,5 @@
 4. In mixer-frontend in login page in the right bottom corner put the address of the mixer-contract
 
 ![Alt Text](./demo.jpg)
+
+Demo: https://drive.google.com/file/d/1CmxxCIoICzwE1ov5Fd-5u-y9V5s-4sC3/view?usp=sharing
